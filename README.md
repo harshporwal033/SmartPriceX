@@ -1,164 +1,142 @@
-💰 Smart Product Pricing (ML Challenge 2025 Submission)
-<!-- A concise, one or two-sentence summary of what your project does. -->
+# 💰 SmartPriceX – AI-Driven Multimodal Product Price Prediction System
 
-This repository presents a multimodal machine learning solution for the Smart Product Pricing Challenge. The goal is to predict the optimal price of e-commerce products by holistically analyzing both their textual attributes (title, description, IPQ from catalog_content) and visual features extracted from product images. The model is optimized to minimize the Symmetric Mean Absolute Percentage Error (SMAPE).
+SmartPriceX is a multimodal machine-learning system designed to **predict optimal e-commerce product prices** by combining image embeddings, textual metadata, and tabular features. The pipeline integrates deep-learning–based image feature extraction, transformer-based text representations, and regression optimized for SMAPE to deliver highly accurate pricing predictions.
 
-📋 Table of Contents
-Project Structure
+---
 
-Features
+## 🔍 Overview
 
-Installation
+Accurate product pricing is a key challenge for online retailers. SmartPriceX addresses this by analysing multiple modalities of data: product images, titles/descriptions, item pack quantities (IPQ) and unit attributes. By fusing visual, textual and tabular signals, the system learns what factors influence pricing and predicts real-world prices accordingly.
 
-Running Predictions
+---
 
-Output Format
+## 🌟 Key Features
 
-Contributing
+### Multimodal Feature Engineering
 
-License
+* **Image pipeline**: Uses an ensemble of ResNet-18, DenseNet-121 and EfficientNet-B0 models (via PyTorch and timm) to generate 512-dimensional embeddings.
+* **Text pipeline**: Uses the `all-MiniLM-L6-v2` Sentence Transformer model to create dense text embeddings from product titles and descriptions.
+* **Tabular features**: Extracts IPQ values, unit types via regex parsing and one-hot encoding, and combines them with text embeddings.
 
-📂 Project Structure
-The project is structured into a root directory (AMLC) containing utility scripts and notebooks for feature extraction, and a subdirectory (AMLC_2025) for the core data and final model training.
+### Model & Pipeline
 
-AMLC/
-├── download_images.ipynb       # Notebook for downloading all product images using utils.py
-├── utils.py                    # Helper functions, including the image download retry logic
-├── image_embedding.ipynb       # Notebook for generating image features (ResNet, DenseNet, EfficientNet ensemble)
-├── text_embedding.ipynb        # Notebook for generating text features (Sentence-Transformer, regex parsing)
-├── AMLC_2025/
-│   ├── data/                   # Directory to store raw CSVs, intermediate features (.npy, .npz), and the target variable
-│   │   ├── train.csv           # Provided training data with price labels
-│   │   ├── test.csv            # Provided test data for prediction
-│   │   ├── test_ids.csv        # Extracted sample_id list for submission formatting
-│   │   ├── X_train_img_ensemble.npy   # Saved 512D image embeddings for training data
-│   │   ├── X_test_img_ensemble.npy    # Saved 512D image embeddings for test data
-│   │   ├── X_train_text_features_bert.npz  # Combined text embeddings, IPQ value, and unit features (training)
-│   │   ├── X_test_text_features_bert.npz   # Combined text embeddings, IPQ value, and unit features (test)
-│   │   └── y_train_full.npy    # Saved array of price (target) values from train.csv
-│   └── Main.ipynb              # Final notebook for combining features, training the multimodal model, and generating test_out.csv
-└── README.md  
+* Data pipeline supports image download, embedding generation, and feature concatenation.
+* Final regression model (custom or ensemble) optimised for **SMAPE** (Symmetric Mean Absolute Percentage Error).
+* Output format standardised for submission: predictions in `test_out.csv` with `sample_id` and `price`.
 
+### Implementation Highlights
 
-✨ Features
-Enhanced Multimodal Feature Extraction: * Image: Leverages an ensemble of ResNet-18, DenseNet-121, and EfficientNet-B0 (using Soft Voting to a 512-dimension vector) for robust image feature generation.
+* Notebook-driven workflow: easy to follow and reproduce.
+* Efficient execution with multiprocessing, GPU support, and safe file operations.
+* Modular codebase for switching out components or extending with new modalities.
 
-Text: Uses the all-MiniLM-L6-v2 Sentence Transformer to create dense embeddings from the combined product name and description.
+---
 
-Comprehensive Feature Engineering: The final text feature set combines the dense text embeddings with tabular features extracted via regex parsing (Item Pack Quantity and one-hot encoded Unit).
+## 📂 Project Structure
 
-Optimized Image Pipeline: Utilizes PyTorch, timm, and optimized multiprocessing/CUDA settings for fast and efficient image feature extraction on large datasets.
+```
+SmartPriceX/
+├── AMLC/                             # Root folder for pipeline  
+│   ├── download_images.ipynb         # Notebook for image download  
+│   ├── utils.py                      # Helper functions (download logic, retries)  
+│   ├── image_embedding.ipynb         # Notebook to generate image embeddings  
+│   ├── text_embedding.ipynb          # Notebook to generate text + tabular embeddings  
+│   └── AMLC_2025/                    # Main model folder  
+│       ├── data/                     # Raw CSVs + intermediate feature files  
+│       │   ├── train.csv  
+│       │   ├── test.csv  
+│       │   ├── test_ids.csv  
+│       │   ├── X_train_img_ensemble.npy  
+│       │   ├── X_test_img_ensemble.npy  
+│       │   ├── X_train_text_features_bert.npz  
+│       │   ├── X_test_text_features_bert.npz  
+│       │   └── y_train_full.npy  
+│       └── Main.ipynb                # Notebook that combines features, trains the model & generates submission  
+├── README.md                         # Project documentation  
+└── requirements.txt                  # Python dependencies  
+```
 
-Optimized for SMAPE: Regression architecture specifically tuned for high performance against the challenge's core evaluation metric.
+---
 
-Automated Data Pipeline: Includes routines for safe, throttled image downloading using utils.py.
+## ⚙️ Installation & Usage
 
-Standardized Output: Generates prediction file (test_out.csv) in the exact format required for submission.
+### 1. Clone the repository
 
-🛠️ Installation
-Follow these steps to set up the project environment locally.
+```bash
+git clone https://github.com/harshporwal033/SmartPriceX.git
+cd SmartPriceX
+```
 
-Prerequisites
-Ensure you have the following installed on your system:
+### 2. Create and activate a virtual environment (recommended)
 
-Python 3.9+
-
-Git
-
-Jupyter Notebook (or JupyterLab) is required to execute the .ipynb files.
-
-PyTorch (Installation with CUDA support is highly recommended for the image embedding step)
-
-Key Python Libraries (managed via requirements.txt):
-
-pandas, timm, torchvision, numpy,
-
-sentence-transformers, scikit-learn, scipy.
-
-Steps
-Clone the repository:
-
-git clone [https://github.com/your-username/your-repository-name.git](https://github.com/your-username/your-repository-name.git)
-cd your-repository-name
-
-Set up virtual environment (Recommended):
-
+```bash
 python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-Install dependencies:
-Ensure your requirements.txt file lists all necessary libraries, including PyTorch.
+### 3. Install dependencies
 
+```bash
 pip install -r requirements.txt
+```
 
-Data Setup:
-Ensure that the provided train.csv and test.csv files are placed inside the AMLC_2025/data/ directory.
+### 4. Data setup
 
-🏃 Running Predictions
-The workflow involves executing four main steps sequentially via their respective Jupyter Notebooks.
+Ensure you place the dataset files (`train.csv`, `test.csv`, etc.) inside the `AMLC/AMLC_2025/data/` directory.
 
-Download Images:
-Execute the download notebook to fetch all images from the provided URLs into the image folders:
+### 5. Run the workflow
 
-# Open and run all cells in the notebook:
-jupyter notebook download_images.ipynb
+* Download images: `jupyter notebook AMLC/download_images.ipynb`
+* Generate image embeddings: `jupyter notebook AMLC/image_embedding.ipynb`
+* Generate text & tabular features: `jupyter notebook AMLC/text_embedding.ipynb`
+* Train model & make predictions: `jupyter notebook AMLC/AMLC_2025/Main.ipynb`
 
-Generate Image Embeddings:
-Run the dedicated notebook to process and save the multimodal image features (X_train_img_ensemble.npy and X_test_img_ensemble.npy) in the AMLC_2025/data/ folder:
+---
 
-# Open and run all cells in the notebook:
-jupyter notebook image_embedding.ipynb
+## 📄 Output Format
 
-Note: This step is GPU-optimized and will be significantly faster if CUDA is available.
+After successful execution, the pipeline will generate `test_out.csv` in the project root (or specified output folder) with the following format:
 
-Generate Text Features:
-Run the dedicated notebook to parse the catalog_content, generate text embeddings, and combine them with engineered tabular features (X_train_text_features_bert.npz and X_test_text_features_bert.npz):
+| Column    | Description                                    |
+| --------- | ---------------------------------------------- |
+| sample_id | Unique identifier matching each test record    |
+| price     | Predicted product price (positive float value) |
 
-# Open and run all cells in the notebook:
-jupyter notebook text_embedding.ipynb
+Example entry:
 
-Generate Final Submission:
-Run the primary notebook which handles loading all combined features, training the final multimodal model, inference on the test set, and outputting the final submission file (test_out.csv):
+```
+75001,14.99
+```
 
-# Navigate to the subdirectory and run the final model notebook:
-cd AMLC_2025
-jupyter notebook Main.ipynb
+---
 
-📄 Output Format
-The successful execution of the final script will generate a file named test_out.csv in the root directory, formatted exactly like dataset/sample_test_out.csv.
+## 🧰 Technologies & Tools Used
 
-Column Name
+* **Programming Language:** Python
+* **Libraries:** NumPy, Pandas, Scikit-learn, Sentence-Transformers, PyTorch, timm
+* **Notebooks:** Jupyter
+* **Feature Engineering:** Image embeddings, text embedding, regex parsing, one-hot encoding
+* **Modeling:** Regression algorithm optimised for SMAPE metric
+* **Development Tools:** Virtual environments, modular notebooks, clear folder structure
 
-Description
+---
 
-Example
+## 👨‍💻 Author
 
-sample_id
+Project developed by **Harsh Porwal**.
+(You may add your contributions or co-author names as needed.)
 
-Unique identifier matching the test records.
+---
 
-75001
+## 🤝 Contributions
 
-price
+Contributions are welcome! If you’d like to improve feature extraction, try a different architecture, or optimise the model further:
 
-Predicted product price (positive float value).
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/your‐idea`
+3. Commit your changes: `git commit -m "Feat: improved …"`
+4. Push to your branch: `git push origin feature/your‐idea`
+5. Open a Pull Request with details of your improvement
 
-14.99
-
-🤝 Contributing
-We welcome contributions! If you have suggestions or want to improve the model's performance, please follow these steps:
-
-Fork the project.
-
-Create your feature branch (git checkout -b feature/model-v2).
-
-Commit your changes (git commit -m 'Feat: Improved feature extraction for images').
-
-Push to the branch (git push origin feature/model-v2).
-
-Open a Pull Request detailing your changes and performance improvements.
-
-⚖️ License
-This project is licensed under the MIT License - see the LICENSE file for details.
-(Note: The final model must be MIT/Apache 2.0 Licensed and up to 8 Billion parameters as per challenge rules.)
+---
 
